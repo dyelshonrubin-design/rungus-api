@@ -2,17 +2,26 @@ from fastapi import FastAPI, Query, Header, HTTPException
 import os
 import psycopg
 
-app = FastAPI()
+app = FastAPI(
+    title="Rungus API",
+    version="0.1.0",
+    servers=[
+        {"url": "https://rungus-api.onrender.com"}
+    ]
+)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 API_KEY = os.environ.get("API_KEY")
 
+
 def get_conn():
     return psycopg.connect(DATABASE_URL)
+
 
 @app.get("/")
 def home():
     return {"message": "Rungus API is running"}
+
 
 @app.get("/words")
 def get_words(
@@ -20,7 +29,7 @@ def get_words(
     english_meaning: str | None = Query(default=None),
     type: str | None = Query(default=None),
     category: str | None = Query(default=None),
-    x_api_key: str | None = Header(default=None)
+    x_api_key: str | None = Header(default=None),
 ):
     if API_KEY and x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Unauthorized")
